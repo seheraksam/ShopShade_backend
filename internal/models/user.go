@@ -13,13 +13,21 @@ type User struct {
 	Username    string             `bson:"username"`
 	Email       string             `bson:"email"`
 	Password    string             `bson:"password"`
-	Address     string             `bson:"address"`
+	Address     []Address          `bson:"address"`
 	Phone       string             `bson:"phone"`
 	CreatedAt   time.Time          `bson:"created_at"`
 	Role        string             `bson:"role"`
 	AuthToken   string             `bson:"auth_token"`
 	ProviderId  primitive.ObjectID `bson:"provider_id"`
-	UserType    string             `bson:"user_type"`
+	UserType    UserType           `bson:"user_type"`
 	TaxID       string             `bson:"tax_id"`
 	CompanyName string             `bson:"company_name"`
 }
+
+type UserType string
+
+const (
+	Customer UserType = "customer"
+	Admin    UserType = "admin"
+	Seller   UserType = "seller"
+)
