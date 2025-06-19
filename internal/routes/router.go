@@ -8,6 +8,12 @@ import (
 func SetupRoutes(router *gin.Engine) {
 	api := router.Group("/api")
 	{
-		api.POST("/user/register", handlers.CreateProductHandler)
+		api.POST("/product/create", handlers.CreateProductHandler)
+		api.GET("/product/list", handlers.GetAllProductsHandler)
+	}
+	auth := router.Group("/auth")
+	{
+		auth.POST("/register", handlers.RegisterHandler)
+		auth.POST("/login", handlers.LoginHandler)
 	}
 }
