@@ -1,7 +1,11 @@
 package routes
 
 import (
+	"os"
+
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/seheraksam/shopshade_backend/internal/auth"
 	"github.com/seheraksam/shopshade_backend/internal/handlers"
 	"github.com/seheraksam/shopshade_backend/middleware"
 )
@@ -9,7 +13,7 @@ import (
 func SetupRoutes(router *gin.Engine) {
 	api := router.Group("/api")
 	{
-		api.POST("/product/create", middleware.AuthMiddleware(), handlers.CreateProductHandler)
+		api.POST("/product/create", middleware.AuthMiddleware(), middleware.RequireRole("seller"), handlers.CreateProductHandler)
 		api.GET("/product/list", middleware.AuthMiddleware(), handlers.GetAllProductsHandler)
 		api.POST("/login", handlers.LoginHandler)
 		api.POST("/register", middleware.AuthMiddleware(), handlers.RegisterHandler)
@@ -18,6 +22,40 @@ func SetupRoutes(router *gin.Engine) {
 			c.JSON(200, gin.H{"message": "Hoş geldin!", "user_id": userID})
 		})
 	}
+	api.POST("/refresh", func(c *gin.Context) {
+		var body struct {
+			RefreshToken string `json:"refresh_token"`
+		}
+
+		if err := c.ShouldBindJSON(&body); err != nil {
+			c.JSON(400, gin.H{"error": "Refresh token eksik"})
+			return
+		}
+
+		token, err := jwt.Parse(body.RefreshToken, func(t *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("JWT_SECRET")), nil
+		})
+		if err != nil || !token.Valid {
+			c.JSON(401, gin.H{"error": "Refresh token geçersiz"})
+			return
+		}
+
+		claims := token.Claims.(jwt.MapClaims)
+		userID := claims["user_id"].(string)
+		role := claims["role"].(string)
+
+		newAccessToken, newRefreshToken, err := auth.GenerateJWT(userID, role)
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Token üretilemedi"})
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"access_token":  newAccessToken,
+			"refresh_token": newRefreshToken,
+		})
+	})
+
 }
 
 //api.POST("/address/create", handlers.CreateAddressHandler)
