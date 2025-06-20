@@ -3,20 +3,20 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/seheraksam/shopshade_backend/internal/handlers"
+	"github.com/seheraksam/shopshade_backend/middleware"
 )
 
 func SetupRoutes(router *gin.Engine) {
 	api := router.Group("/api")
 	{
-		api.POST("/product/create", handlers.CreateProductHandler)
-		api.GET("/product/list", handlers.GetAllProductsHandler)
+		api.POST("/product/create", middleware.AuthMiddleware(), handlers.CreateProductHandler)
+		api.GET("/product/list", middleware.AuthMiddleware(), handlers.GetAllProductsHandler)
 		api.POST("/login", handlers.LoginHandler)
-		api.POST("/register", handlers.RegisterHandler)
-	}
-	auth := router.Group("/auth")
-	{
-		auth.POST("/register", handlers.RegisterHandler)
-		auth.POST("/login", handlers.LoginHandler)
+		api.POST("/register", middleware.AuthMiddleware(), handlers.RegisterHandler)
+		api.GET("/profile", middleware.AuthMiddleware(), func(c *gin.Context) {
+			userID := c.MustGet("user_id").(string)
+			c.JSON(200, gin.H{"message": "Hoş geldin!", "user_id": userID})
+		})
 	}
 }
 
