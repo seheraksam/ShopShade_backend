@@ -40,11 +40,24 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := auth.GenerateJWT(user.ID.Hex(), user.Role)
+	accessToken, err := auth.GenerateJWT(user.ID.Hex(), user.Role)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "token error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"access_token": accessToken, "refresh_token": refreshToken})
+	c.JSON(http.StatusOK, gin.H{
+		"access_token": accessToken,
+		"user": gin.H{
+			"id":         user.ID.Hex(),
+			"username":   user.Username,
+			"email":      user.Email,
+			"role":       user.Role,
+			"first_name": user.FirstName,
+			"last_name":  user.LastName,
+			"name":       user.FirstName,
+			"surname":    user.LastName,
+		},
+	})
+
 }

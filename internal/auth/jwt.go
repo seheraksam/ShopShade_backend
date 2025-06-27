@@ -9,37 +9,38 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateJWT(userID string, role string) (string, string, error) {
+func GenerateJWT(userID string, role string) (string, error) {
 	jwtKey := os.Getenv("JWT_SECRET")
+	fmt.Println("on jwt.go jwtKey", jwtKey)
 	if jwtKey == "" {
-		return "", "", errors.New("JWT_SECRET is not set")
+		return "", errors.New("JWT_SECRET is not set")
 	}
-	fmt.Println(jwtKey)
+
 	accessClaims := jwt.MapClaims{
 		"user_id": userID,
 		"role":    role,
 		"exp":     time.Now().Add(15 * time.Minute).Unix(),
 	}
 	fmt.Println(accessClaims)
-	refreshClaims := jwt.MapClaims{
+	/*refreshClaims := jwt.MapClaims{
 		"user_id": userID,
 		"exp":     time.Now().Add(7 * 24 * time.Hour).Unix(),
-	}
+	}*/
 	fmt.Println(accessClaims)
 	accessT := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims)
-	refreshT := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
+	//refreshT := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
 	fmt.Println(accessT)
-	fmt.Println(refreshT)
-	accessToken, err := accessT.SignedString(jwtKey)
+	//fmt.Println(refreshT)
+	accessToken, err := accessT.SignedString([]byte(jwtKey))
 	if err != nil {
-		return "", "", errors.New("access token error")
+		return "", errors.New("access token error")
 	}
 	fmt.Println(accessToken)
-
-	refreshToken, err := refreshT.SignedString(jwtKey)
+	/*refreshToken, err := refreshT.SignedString([]byte(jwtKey))
 	if err != nil {
 		return "", "", errors.New("refresh token error")
-	}
-	fmt.Println(refreshToken)
-	return accessToken, refreshToken, nil
+		}*/
+
+	//fmt.Println(refreshToken)
+	return accessToken, nil
 }

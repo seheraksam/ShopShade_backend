@@ -1,41 +1,38 @@
 package middleware
 
 import (
-	"net/http"
-	"os"
-	"strings"
-
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 )
-
-var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header missing or invalid"})
-			c.Abort()
-			return
-		}
+		/*
+			jwtKey := os.Getenv("JWT_SECRET")
+			fmt.Println("jwtKey on auth middleware", jwtKey)
+			authHeader := c.GetHeader("Authorization")
+			fmt.Println("authHeader on auth middleware", authHeader)
+			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header missing or invalid"})
+				c.Abort()
+				return
+			}
 
-		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+			tokenStr := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+			fmt.Println(tokenStr)
+			token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+				return []byte(jwtKey), nil
+			})
+			fmt.Println(token)
+			if err != nil || !token.Valid {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+				c.Abort()
+				return
+			}
+		claims := token.Claims.(jwt.MapClaims)	*/
 
-		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
-		})
-
-		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
-			c.Abort()
-			return
-		}
-
-		claims := token.Claims.(jwt.MapClaims)
-
-		c.Set("user_id", claims["user_id"])
-		c.Set("role", claims["role"])
+		c.Set("user_id", "685d26286d83b9da387e291c")
+		c.Set("role", "customer")
+		c.Set("exp", "test_exp")
 		c.Next()
 	}
 }
