@@ -15,10 +15,10 @@ import (
 
 func CreateOrderHandler(c *gin.Context) {
 	var req struct {
-		UserID            string `json:"user_id"`
-		ShippingAddressID string `json:"shipping_address_id"`
-		BillAddressID     string `json:"bill_address_id"`
-		PaymentMethod     string `json:"payment_method"`
+		UserID            string         `json:"user_id"`
+		ShippingAddressID string         `json:"shipping_address_id"`
+		BillAddressID     string         `json:"bill_address_id"`
+		Payment           models.Payment `json:"payment"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
@@ -33,14 +33,14 @@ func CreateOrderHandler(c *gin.Context) {
 
 	var total float64
 	for _, item := range selectedItems {
-		total += float64(item.Quantity) * float64(item.Quantity)
+		total += float64(item.Quantity) * item.Price
 	}
 
 	payment := models.Payment{
-		ID:            primitive.NewObjectID(),
-		PaymentMethod: models.PaymentMethod(req.PaymentMethod),
-		Status:        models.OrderStatusPending,
-		Amount:        total,
+		ID:            req.Payment.ID,
+		PaymentMethod: req.Payment.PaymentMethod,
+		Status:        req.Payment.Status,
+		Amount:        req.Payment.Amount,
 		CreatedAt:     time.Now(),
 	}
 

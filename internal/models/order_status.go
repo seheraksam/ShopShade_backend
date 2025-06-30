@@ -8,9 +8,11 @@ import (
 
 type OrderStatus struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty"`
+	Order_Id  primitive.ObjectID `bson:"order_id,omitempty"`
 	Type      Status             `bson:"type"`
 	CreatedAt time.Time          `bson:"created_at"`
 }
+
 type Status string
 
 const (
