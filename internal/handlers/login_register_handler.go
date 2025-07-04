@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,8 @@ func LoginHandler(c *gin.Context) {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
+
+	fmt.Println(req)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})

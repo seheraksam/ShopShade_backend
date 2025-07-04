@@ -13,7 +13,6 @@ func SetupRoutes(router *gin.Engine) {
 		api.POST("/product/create", middleware.AuthMiddleware(), middleware.RequireRole("customer"), handlers.CreateProductHandler)
 		api.GET("/product/list", middleware.AuthMiddleware(), handlers.GetAllProductsHandler)
 		api.POST("/register", middleware.AuthMiddleware(), handlers.RegisterHandler)
-		api.GET("/profile", middleware.AuthMiddleware(), handlers.LoginHandler)
 		api.POST("/me", middleware.AuthMiddleware(), handlers.GetMeHandler)
 		api.POST("/cart/add", middleware.AuthMiddleware(), handlers.CartItemAddHandler)
 		api.POST("/cart/update", middleware.AuthMiddleware(), handlers.CartItemUpdateHandler)
